@@ -32,30 +32,38 @@
         <fields name="params">
             <fieldset name="basic">
                 <field
-                    name="thing"
-                    type="text"
-                    label="MOD_DATAVIEW_THING_LABEL"
-                    description="MOD_DATAVIEW_THING_DESC"
-                    default=""
-                    required="true"
-                />
-            </fieldset>
-            <fieldset name="advanced">
-                <field
-                    name="adv_thing"
-                    type="text"
-                    label="MOD_DATAVIEW_ADV_THING_LABEL"
-                    description="MOD_DATAVIEW_ADV_THING_DESC"
+                    name="data_src"
+                    type="url"
+                    label="MOD_DATAVIEW_DATA_PANE_SRC_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_SRC_DESC"
+                    size="40"
                     default=""
                 />
-            </fieldset>
-            <fieldset name="custom_fieldset">
                 <field
-                    name="c1_thing"
-                    type="text"
-                    label="MOD_DATAVIEW_CUSTOM_THING_LABEL"
-                    description="MOD_DATAVIEW_CUSTOM_THING_DESC"
+                    name="data_tpl"
+                    type="textarea"
+                    label="MOD_DATAVIEW_DATA_PANE_TPL_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_TPL_DESC"
                     default=""
+                    rows="10"
+                    filter="raw"
+                    class="monospace"
+                />
+                <field
+                    name="data_src_err"
+                    type="textarea"
+                    label="MOD_DATAVIEW_DATA_PANE_SOURCE_ERROR_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_SOURCE_ERROR_DESC"
+                    default="Data could not be fetched from the data source."
+                    rows="3"
+                />
+                <field
+                    name="data_decode_err"
+                    type="textarea"
+                    label="MOD_DATAVIEW_DATA_PANE_DECODE_ERROR_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_DECODE_ERROR_DESC"
+                    default="Data could not be decoded as JSON."
+                    rows="3"
                 />
             </fieldset>
         </fields>
