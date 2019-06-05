@@ -25,6 +25,7 @@
         <filename>index.html</filename>
         <folder>language</folder>
         <folder>tmpl</folder>
+        <folder>vendor</folder>
     </files>
 
     <config>
