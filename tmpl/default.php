@@ -31,7 +31,7 @@ if (!$data = file_get_contents($data_src)) {
     if (!$json = json_decode($data)) {
         $output = Markdown::defaultTransform($data_decode_err);
     } else {
-        $twig = ModBrochureHelper::getTwig(array(
+        $twig = ModDataviewHelper::getTwig(array(
             'tpl' => $data_tpl
         ));
 
