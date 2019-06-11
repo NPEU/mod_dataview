@@ -13,9 +13,7 @@ use Joomla\String\StringHelper;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-
 use \Michelf\Markdown;
-
 
 /**
  * Helper for mod_dataview

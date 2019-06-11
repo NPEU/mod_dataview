@@ -35,6 +35,9 @@ if (!$data = file_get_contents($data_src)) {
             'tpl' => $data_tpl
         ));
 
+        // Encode then re-decode to produce valid JSON:
+        $json = json_encode($json, true);
+        $json = json_decode($json, true);
         $output = $twig->render('tpl', array('data' => $json));
     }
 }
