@@ -10,7 +10,7 @@
     <license>MIT License; see LICENSE.md</license>
 
     <!--  The version string is recorded in the components table -->
-    <version>1.0.1</version>
+    <version>1.0.0</version>
     <!-- The description is optional and defaults to the name -->
     <description>MOD_DATAVIEW_XML_DESCRIPTION</description>
 
@@ -65,6 +65,23 @@
                     default="Data could not be decoded as JSON."
                     rows="3"
                 />
+            </fieldset>
+            <fieldset
+                name="assets"
+                label="MOD_DATAVIEW_ASSETS_FIELDSET_LABEL"
+                description="MOD_DATAVIEW_ASSETS_FIELDSET_DESC"
+            >
+                <field
+                    name="highcharts"
+                    type="radio"
+                    default="0"
+                    label="MOD_DATAVIEW_ASSETS_HIGHCHARTS_LABEL"
+                    description="MOD_DATAVIEW_ASSETS_HIGHCHARTS_DESC"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
             </fieldset>
         </fields>
     </config>

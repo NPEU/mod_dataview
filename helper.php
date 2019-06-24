@@ -21,6 +21,29 @@ use \Michelf\Markdown;
 class ModDataviewHelper
 {
     /**
+     * Loads JS/CSS
+     *
+     * @param array $params
+     * @return void
+     * @access public
+     */
+    public static function loadAssets($params)
+    {
+        $doc = JFactory::getDocument();
+        //$doc->addStyleSheet();
+        //$doc->addScript();
+        
+        if ($params->get('highcharts', false)) {
+            $doc->addScript('https://code.highcharts.com/highcharts.js');
+            $doc->addScript('https://code.highcharts.com/modules/exporting.js');
+            $doc->addScript('https://code.highcharts.com/modules/export-data.js');
+            $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
+        }
+    }
+
+    
+    
+    /**
      * Creates an HTML-friendly string for use in id's
      *
      * @param string $text
@@ -158,6 +181,12 @@ class ModDataviewHelper
             return $new_string;
         });
         $twig->addFilter($html_id_filter);
+
+        // Add sum filter:
+        $sum_filter = new Twig_SimpleFilter('sum', function ($array) {
+            return array_sum($array);
+        });
+        $twig->addFilter($sum_filter);
 
 
         return $twig;
