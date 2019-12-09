@@ -9,6 +9,10 @@
 
 defined('_JEXEC') or die;
 
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use \Michelf\Markdown;
+
 
 $doc = JFactory::getDocument();
 
@@ -25,20 +29,33 @@ if (strpos($data_src, 'http') !== 0) {
     $data_src = $domain . '/' . trim($data_src, '/');
 }
 
-if (!$data = file_get_contents($data_src)) {
+$data = @file_get_contents($data_src);
+if ($data === false) {
     $output = Markdown::defaultTransform($data_src_err);
 } else {
     if (!$json = json_decode($data)) {
         $output = Markdown::defaultTransform($data_decode_err);
     } else {
+        
         $twig = ModDataviewHelper::getTwig(array(
             'tpl' => $data_tpl
         ));
-
+ 
         // Encode then re-decode to produce valid JSON:
         $json = json_encode($json, true);
         $json = json_decode($json, true);
-        $output = $twig->render('tpl', array('data' => $json));
+        
+        #echo '<pre>'; var_dump($data_tpl); echo '</pre>'; #exit;
+        #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
+        
+        //$output = $twig->render('tpl', array('data' => $json));
+        
+        try {
+            $output = $twig->render('tpl', array('data' => $json));
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
+       
     }
 }
 ?>
