@@ -128,6 +128,7 @@ class ModDataviewHelper
     {
         $loader = new Twig_Loader_Array($tpls);
         $twig   = new Twig_Environment($loader);
+        //$twig = new Twig_Environment($loader, ['debug' => true]);
 
         // Add markdown filter:
         $md_filter = new Twig_SimpleFilter('md', function ($string) {
@@ -187,6 +188,16 @@ class ModDataviewHelper
             return array_sum($array);
         });
         $twig->addFilter($sum_filter);
+        
+        // Add str_replace filter:
+		$pad_filter = new Twig_SimpleFilter('str_replace', function ($string, $search = '', $replace = '') {
+    		$new_string = '';
+ 
+    		$new_string = str_replace( $search, $replace, $string);
+    		
+    		return $new_string;
+		});
+		$twig->addFilter($pad_filter);
 
 
         return $twig;
