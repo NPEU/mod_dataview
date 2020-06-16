@@ -29,7 +29,28 @@ if (strpos($data_src, 'http') !== 0) {
     $data_src = $domain . '/' . trim($data_src, '/');
 }
 
-$data = @file_get_contents($data_src);
+// Check for proxy:
+$proxy     = NULL;
+$config    = JFactory::getConfig();
+$has_proxy = $config->get('proxy_enable');
+
+if ($has_proxy) {
+    $proxy_host = $config->get('proxy_host');
+    $proxy_port = $config->get('proxy_port');
+    $proxy_user = $config->get('proxy_user');
+    $proxy_pass = $config->get('proxy_pass');
+    
+    $context = array(
+        'http' => array(
+            'proxy'           => $proxy_host . ':' . $proxy_port,
+            'request_fulluri' => true
+        )
+    );
+    $proxy = stream_context_create($context);
+}
+
+$data = file_get_contents($data_src, false, $proxy);
+
 if ($data === false) {
     $output = Markdown::defaultTransform($data_src_err);
 } else {
