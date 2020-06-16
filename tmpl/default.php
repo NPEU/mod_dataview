@@ -29,12 +29,15 @@ if (strpos($data_src, 'http') !== 0) {
     $data_src = $domain . '/' . trim($data_src, '/');
 }
 
-// Check for proxy:
+// Inspect the final URL to determine if it's an internal or external address:
+$url_parts = parse_url($data_src);
+
+// Check for proxy: (note we DON'T want to use this if it's an internal URL)
 $proxy     = NULL;
 $config    = JFactory::getConfig();
 $has_proxy = $config->get('proxy_enable');
 
-if ($has_proxy) {
+if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
     $proxy_host = $config->get('proxy_host');
     $proxy_port = $config->get('proxy_port');
     $proxy_user = $config->get('proxy_user');
