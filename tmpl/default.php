@@ -42,7 +42,7 @@ if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
     $proxy_port = $config->get('proxy_port');
     $proxy_user = $config->get('proxy_user');
     $proxy_pass = $config->get('proxy_pass');
-    
+
     $context = array(
         'http' => array(
             'proxy'           => $proxy_host . ':' . $proxy_port,
@@ -53,6 +53,7 @@ if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
 }
 
 $data = file_get_contents($data_src, false, $proxy);
+$output = '';
 
 if ($data === false) {
     $output = Markdown::defaultTransform($data_src_err);
@@ -60,26 +61,26 @@ if ($data === false) {
     if (!$json = json_decode($data)) {
         $output = Markdown::defaultTransform($data_decode_err);
     } else {
-        
+
         $twig = ModDataviewHelper::getTwig(array(
             'tpl' => $data_tpl
         ));
- 
+
         // Encode then re-decode to produce valid JSON:
         $json = json_encode($json, true);
         $json = json_decode($json, true);
-        
+
         #echo '<pre>'; var_dump($data_tpl); echo '</pre>'; #exit;
         #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
-        
+
         //$output = $twig->render('tpl', array('data' => $json));
-        
+
         try {
             $output = $twig->render('tpl', array('data' => $json));
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
-       
+
     }
 }
 ?>
