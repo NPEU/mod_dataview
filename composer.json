@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "license": "MIT",
     "require": {
-        "twig/twig": "2.0",
-        "michelf/php-markdown": "^1.8"
+        "twig/twig": "3.0",
+        "michelf/php-markdown": "^1.9"
     },
     "authors": [
         {

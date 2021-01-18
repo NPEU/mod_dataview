@@ -23,7 +23,7 @@ $data_decode_err = $params->get('data_decode_err');
 
 // Allow for relative data src URLs:
 if (strpos($data_src, 'http') !== 0) {
-    $s        = empty($_SERVER['SERVER_PORT']) ? '' : ($_SERVER['SERVER_PORT'] == '443') ? 's' : '';
+    $s        = empty($_SERVER['SERVER_PORT']) ? '' : ($_SERVER['SERVER_PORT'] == '443' ? 's' : '');
     $protocol = preg_replace('#/.*#',  $s, strtolower($_SERVER['SERVER_PROTOCOL']));
     $domain   = $protocol.'://'.$_SERVER['SERVER_NAME'];
     $data_src = $domain . '/' . trim($data_src, '/');
