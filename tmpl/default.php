@@ -74,9 +74,14 @@ if ($data === false) {
         #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
 
         //$output = $twig->render('tpl', array('data' => $json));
+        
+        $version = 1;
+        if (!empty($_SERVER['JTV2'])) {
+            $version = 2;
+        }
 
         try {
-            $output = $twig->render('tpl', array('data' => $json));
+            $output = $twig->render('tpl', array('data' => $json, 'version' => $version));
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
