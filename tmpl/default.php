@@ -17,9 +17,93 @@ use \Michelf\Markdown;
 $doc = JFactory::getDocument();
 
 $data_src        = $params->get('data_src');
+$data_aqs_tog    = $params->get('aqs_tog');
+$data_aqs        = $params->get('aqs');
 $data_tpl        = $params->get('data_tpl');
 $data_src_err    = $params->get('data_src_err');
 $data_decode_err = $params->get('data_decode_err');
+
+$url_qs = $_SERVER['QUERY_STRING'];
+
+$form_vals = [];
+$qs_empty = empty($url_qs);
+
+// Process Advanced Query Strings:
+if (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs)) {
+
+    $new_qs = [];
+
+    $lines = explode("\n", trim(str_replace("\n\n", "\n", str_replace("\r", "\n", $data_aqs))));
+
+    parse_str($url_qs, $url_qs_array);
+#echo 'url_qs_array<pre>'; var_dump($url_qs_array); echo '</pre>'; #exit;
+    foreach ($lines as $line) {
+
+        list($param_name, $param_values) = explode("=", $line);
+        
+
+        // Are multiple values allowed? (array)
+        $val_array_allowed = false;
+        if (strstr($param_name, '[]') !== false) {
+            $val_array_allowed = true;
+            $param_name = str_replace('[]', '', $param_name);
+        }
+
+#echo 'param_name<pre>'; var_dump($param_name); echo '</pre>'; #exit;
+        // Check the name of the param exists in the query string
+        if (!array_key_exists($param_name, $url_qs_array)) {
+            // This name does not appear in the URL, ignore:
+            continue;
+        }
+#echo 'param_values<pre>'; var_dump($param_values); echo '</pre>'; #exit;
+#echo 'param_name<pre>'; var_dump($param_name); echo '</pre>'; #exit;
+        if (preg_match('#/.+/#', $param_values)) {
+            // Test the pattern against the qs value:
+        } else {
+            if (strpos($param_values, '|') !== false) {
+                $vals = explode('|', trim($param_values));
+#echo 'vals<pre>'; var_dump($vals); echo '</pre>'; #exit;
+#echo 'vals<pre>'; var_dump($url_qs_array[$param_name]); echo '</pre>'; #exit;
+
+                if (is_array($url_qs_array[$param_name])) {
+                    $t = [];
+                    foreach ($url_qs_array[$param_name] as $v) {
+                        if (in_array($v, $vals)) {
+                            $t[] = $v;
+                        }
+                    }
+                    $new_qs[$param_name] = implode(',', $t);
+
+                } else {
+
+                    if (in_array($url_qs_array[$param_name], $vals)) {
+                        $new_qs[$param_name] = $url_qs_array[$param_name];
+                    }
+                }
+
+            } else {
+            // Unsupported value type, ignore:
+                continue;
+            }
+        }
+
+    }
+
+    if (!empty($new_qs)) {
+        $data_src = preg_replace('/\?.*$/', '', $data_src);
+        $data_src .= '?' . urldecode(http_build_query($new_qs));
+    }
+
+    #echo '<pre>'; var_dump($data_src); echo '</pre>'; exit;
+}
+
+if (!empty($new_qs)) {
+    foreach ($new_qs as $name => $vals) {
+        $form_vals[$name] = explode(',', $vals);
+    }
+
+}
+#echo '<pre>'; var_dump($form_vals); echo '</pre>'; exit;
 
 // Allow for relative data src URLs:
 if (strpos($data_src, 'http') !== 0) {
@@ -58,7 +142,8 @@ $output = '';
 if ($data === false) {
     $output = Markdown::defaultTransform($data_src_err);
 } else {
-    if (!$json = json_decode($data)) {
+    $json = json_decode($data);
+    if (is_null($json)) {
         $output = Markdown::defaultTransform($data_decode_err);
     } else {
 
@@ -74,14 +159,14 @@ if ($data === false) {
         #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
 
         //$output = $twig->render('tpl', array('data' => $json));
-        
+
         $version = 1;
         if (!empty($_SERVER['JTV2'])) {
             $version = 2;
         }
 
         try {
-            $output = $twig->render('tpl', array('data' => $json, 'version' => $version));
+            $output = $twig->render('tpl', array('data' => $json, 'version' => $version, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty));
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }

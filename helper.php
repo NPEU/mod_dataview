@@ -32,6 +32,9 @@ class ModDataviewHelper
         $doc = JFactory::getDocument();
         //$doc->addStyleSheet();
         //$doc->addScript();
+   
+        $template_path = JURI::root() . '/templates/npeu6';
+
         
         if ($params->get('highcharts', false)) {
             $doc->addScript('https://code.highcharts.com/highcharts.js');
@@ -39,6 +42,16 @@ class ModDataviewHelper
             $doc->addScript('https://code.highcharts.com/modules/export-data.js');
             $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
             $doc->addScript('https://code.highcharts.com/modules/annotations.js');
+        }
+        
+        if ($params->get('filterability', false)) {
+            // Note I should probably use a CDN for this so it's not template-specific:
+            $doc->addScript($template_path . '/js/filter.min.js');
+        }
+        
+        if ($params->get('sortability', false)) {
+            // Note I should probably use a CDN for this so it's not template-specific:
+            $doc->addScript($template_path . '/js/sort.min.js');
         }
     }
 

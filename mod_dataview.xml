@@ -40,6 +40,28 @@
                     default=""
                 />
                 <field
+                    name="aqs_tog"
+                    type="radio"
+                    default="0"
+                    label="MOD_DATAVIEW_DATA_PANE_ADV_QUERY_TOG_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_ADV_QUERY_TOG_DESC"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="aqs"
+                    type="textarea"
+                    label="MOD_DATAVIEW_DATA_PANE_ADV_QUERY_LABEL"
+                    description="MOD_DATAVIEW_DATA_PANE_ADV_QUERY_DESC"
+                    default=""
+                    rows="10"
+                    filter="raw"
+                    class="monospace"
+                    showon="aqs_tog:1"
+                />
+                <field
                     name="data_tpl"
                     type="textarea"
                     label="MOD_DATAVIEW_DATA_PANE_TPL_LABEL"
@@ -77,6 +99,28 @@
                     default="0"
                     label="MOD_DATAVIEW_ASSETS_HIGHCHARTS_LABEL"
                     description="MOD_DATAVIEW_ASSETS_HIGHCHARTS_DESC"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="filterability"
+                    type="radio"
+                    default="0"
+                    label="MOD_DATAVIEW_ASSETS_FILTER_LABEL"
+                    description="MOD_DATAVIEW_ASSETS_FILTER_DESC"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="sortability"
+                    type="radio"
+                    default="0"
+                    label="MOD_DATAVIEW_ASSETS_SORT_LABEL"
+                    description="MOD_DATAVIEW_SORT_FILTER_DESC"
                     class="btn-group btn-group-yesno"
                 >
                     <option value="1">JYES</option>
