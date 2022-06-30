@@ -32,10 +32,10 @@ class ModDataviewHelper
         $doc = JFactory::getDocument();
         //$doc->addStyleSheet();
         //$doc->addScript();
-   
+
         $template_path = JURI::root() . '/templates/npeu6';
 
-        
+
         if ($params->get('highcharts', false)) {
             $doc->addScript('https://code.highcharts.com/highcharts.js');
             $doc->addScript('https://code.highcharts.com/modules/exporting.js');
@@ -43,20 +43,20 @@ class ModDataviewHelper
             $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
             $doc->addScript('https://code.highcharts.com/modules/annotations.js');
         }
-        
+
         if ($params->get('filterability', false)) {
             // Note I should probably use a CDN for this so it's not template-specific:
             $doc->addScript($template_path . '/js/filter.min.js');
         }
-        
+
         if ($params->get('sortability', false)) {
             // Note I should probably use a CDN for this so it's not template-specific:
             $doc->addScript($template_path . '/js/sort.min.js');
         }
     }
 
-    
-    
+
+
     /**
      * Creates an HTML-friendly string for use in id's
      *
@@ -202,16 +202,65 @@ class ModDataviewHelper
             return array_sum($array);
         });
         $twig->addFilter($sum_filter);
-        
+
         // Add str_replace filter:
-		$pad_filter = new \Twig\TwigFilter('str_replace', function ($string, $search = '', $replace = '') {
+		$str_replace = new \Twig\TwigFilter('str_replace', function ($string, $search = '', $replace = '') {
     		$new_string = '';
- 
+
     		$new_string = str_replace( $search, $replace, $string);
-    		
+
     		return $new_string;
 		});
-		$twig->addFilter($pad_filter);
+		$twig->addFilter($str_replace);
+
+
+       // Add filter for image path (height from width):
+       $img_height_filter = new \Twig\TwigFilter('height', function ($image_path, $width) {
+
+            $image_info = getimagesize($image_path);
+
+            if (!$image_info) {
+                return 'image path not found: ' . $image_path;
+            }
+
+            $width = (int) $width;
+            
+            if ($image_info[0] > $image_info[1]) {
+                $image_ratio = $image_info[0] / $image_info[1];
+                $height = round($width / $image_ratio);
+            } else {
+                $image_ratio = $image_info[1] / $image_info[0];
+                $height = round($width * $image_ratio);
+            }
+            //$height = round($width * $image_ratio);
+
+    		return $height;
+		});
+		$twig->addFilter($img_height_filter);
+
+       // Add filter for image path (width from height):
+       $img_width_filter = new \Twig\TwigFilter('width', function ($image_path, $height) {
+
+            $image_info = getimagesize($image_path);
+
+            if (!$image_info) {
+                return 'image path not found: ' . $image_path;
+            }
+
+            $height = (int) $height;
+             
+            if ($image_info[0] > $image_info[1]) {
+                $image_ratio = $image_info[0] / $image_info[1];
+                $width = round($height * $image_ratio);
+            } else {
+                $image_ratio = $image_info[1] / $image_info[0];
+                $width = round($height / $image_ratio);
+            }
+            //$width = round($height / $image_ratio);
+
+    		return $width;
+		});
+		$twig->addFilter($img_width_filter);
 
 
         return $twig;
