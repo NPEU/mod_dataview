@@ -40,7 +40,7 @@ if (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs)) {
     foreach ($lines as $line) {
 
         list($param_name, $param_values) = explode("=", $line);
-        
+
 
         // Are multiple values allowed? (array)
         $val_array_allowed = false;

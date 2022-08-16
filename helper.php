@@ -214,17 +214,34 @@ class ModDataviewHelper
 		$twig->addFilter($str_replace);
 
 
+       // Add filter for image fallback (image to use if preferred one doesn't exist):
+        $img_fallback_filter = new \Twig\TwigFilter('fallback', function ($image_path, $fallback_path) {
+
+            $file_headers = @get_headers($image_path);
+            if($file_headers[0] != 'HTTP/1.1 404 Not Found') {
+                return $image_path;
+            }
+
+            $file_headers = @get_headers($fallback_path);
+            if($file_headers[0] != 'HTTP/1.1 404 Not Found') {
+                return $fallback_path;
+            }
+
+            return '';
+		});
+		$twig->addFilter($img_fallback_filter);
+
        // Add filter for image path (height from width):
        $img_height_filter = new \Twig\TwigFilter('height', function ($image_path, $width) {
 
-            $image_info = getimagesize($image_path);
+            $image_info = @getimagesize($image_path);
 
             if (!$image_info) {
                 return 'image path not found: ' . $image_path;
             }
 
             $width = (int) $width;
-            
+
             if ($image_info[0] > $image_info[1]) {
                 $image_ratio = $image_info[0] / $image_info[1];
                 $height = round($width / $image_ratio);
@@ -241,14 +258,14 @@ class ModDataviewHelper
        // Add filter for image path (width from height):
        $img_width_filter = new \Twig\TwigFilter('width', function ($image_path, $height) {
 
-            $image_info = getimagesize($image_path);
+            $image_info = @getimagesize($image_path);
 
             if (!$image_info) {
                 return 'image path not found: ' . $image_path;
             }
 
             $height = (int) $height;
-             
+
             if ($image_info[0] > $image_info[1]) {
                 $image_ratio = $image_info[0] / $image_info[1];
                 $width = round($height * $image_ratio);
