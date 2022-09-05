@@ -16,7 +16,11 @@ use \Michelf\Markdown;
 
 $doc = JFactory::getDocument();
 
-$data_src        = $params->get('data_src');
+$output          = false;
+$data            = false;
+$json            = false;
+
+$data_src        = $params->get('data_src', false);
 $data_aqs_tog    = $params->get('aqs_tog');
 $data_aqs        = $params->get('aqs');
 $data_tpl        = $params->get('data_tpl');
@@ -29,7 +33,7 @@ $form_vals = [];
 $qs_empty = empty($url_qs);
 
 // Process Advanced Query Strings:
-if (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs)) {
+if ($data_src && (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs))) {
 
     $new_qs = [];
 
@@ -82,7 +86,7 @@ if (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs)) {
                 }
 
             } else {
-            // Unsupported value type, ignore:
+                // Unsupported value type, ignore:
                 continue;
             }
         }
@@ -95,83 +99,87 @@ if (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs)) {
     }
 
     #echo '<pre>'; var_dump($data_src); echo '</pre>'; exit;
-}
 
-if (!empty($new_qs)) {
-    foreach ($new_qs as $name => $vals) {
-        $form_vals[$name] = explode(',', $vals);
+    if (!empty($new_qs)) {
+        foreach ($new_qs as $name => $vals) {
+            $form_vals[$name] = explode(',', $vals);
+        }
     }
-
 }
+
+
 #echo '<pre>'; var_dump($form_vals); echo '</pre>'; exit;
 
-// Allow for relative data src URLs:
-if (strpos($data_src, 'http') !== 0) {
-    $s        = empty($_SERVER['SERVER_PORT']) ? '' : ($_SERVER['SERVER_PORT'] == '443' ? 's' : '');
-    $protocol = preg_replace('#/.*#',  $s, strtolower($_SERVER['SERVER_PROTOCOL']));
-    $domain   = $protocol.'://'.$_SERVER['SERVER_NAME'];
-    $data_src = $domain . '/' . trim($data_src, '/');
-}
+if ($data_src) {
+    // Allow for relative data src URLs:
+    if (strpos($data_src, 'http') !== 0) {
+        $s        = empty($_SERVER['SERVER_PORT']) ? '' : ($_SERVER['SERVER_PORT'] == '443' ? 's' : '');
+        $protocol = preg_replace('#/.*#',  $s, strtolower($_SERVER['SERVER_PROTOCOL']));
+        $domain   = $protocol.'://'.$_SERVER['SERVER_NAME'];
+        $data_src = $domain . '/' . trim($data_src, '/');
+    }
 
-// Inspect the final URL to determine if it's an internal or external address:
-$url_parts = parse_url($data_src);
+    // Inspect the final URL to determine if it's an internal or external address:
+    $url_parts = parse_url($data_src);
 
-// Check for proxy: (note we DON'T want to use this if it's an internal URL)
-$proxy     = NULL;
-$config    = JFactory::getConfig();
-$has_proxy = $config->get('proxy_enable');
+    // Check for proxy: (note we DON'T want to use this if it's an internal URL)
+    $proxy     = NULL;
+    $config    = JFactory::getConfig();
+    $has_proxy = $config->get('proxy_enable');
 
-if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
-    $proxy_host = $config->get('proxy_host');
-    $proxy_port = $config->get('proxy_port');
-    $proxy_user = $config->get('proxy_user');
-    $proxy_pass = $config->get('proxy_pass');
+    if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
+        $proxy_host = $config->get('proxy_host');
+        $proxy_port = $config->get('proxy_port');
+        $proxy_user = $config->get('proxy_user');
+        $proxy_pass = $config->get('proxy_pass');
 
-    $context = array(
-        'http' => array(
-            'proxy'           => $proxy_host . ':' . $proxy_port,
-            'request_fulluri' => true
-        )
-    );
-    $proxy = stream_context_create($context);
-}
+        $context = array(
+            'http' => array(
+                'proxy'           => $proxy_host . ':' . $proxy_port,
+                'request_fulluri' => true
+            )
+        );
+        $proxy = stream_context_create($context);
+    }
 
-$data = file_get_contents($data_src, false, $proxy);
-$output = '';
+    $data = file_get_contents($data_src, false, $proxy);
 
-if ($data === false) {
-    $output = Markdown::defaultTransform($data_src_err);
-} else {
-    $json = json_decode($data);
-    if (is_null($json)) {
-        $output = Markdown::defaultTransform($data_decode_err);
+    if ($data === false) {
+        $output = Markdown::defaultTransform($data_src_err);
     } else {
-
-        $twig = ModDataviewHelper::getTwig(array(
-            'tpl' => $data_tpl
-        ));
-
+        $json = json_decode($data);
+        if (is_null($json)) {
+            $output = Markdown::defaultTransform($data_decode_err);
+        }
         // Encode then re-decode to produce valid JSON:
         $json = json_encode($json, true);
         $json = json_decode($json, true);
-
-        #echo '<pre>'; var_dump($data_tpl); echo '</pre>'; #exit;
-        #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
-
-        //$output = $twig->render('tpl', array('data' => $json));
-
-        $version = 1;
-        if (!empty($_SERVER['JTV2'])) {
-            $version = 2;
-        }
-
-        try {
-            $output = $twig->render('tpl', array('data' => $json, 'version' => $version, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty));
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        }
-
     }
+} else {
+    $json = json_decode('{}', true);
+}
+
+if ($output === false) {
+    $twig = ModDataviewHelper::getTwig(array(
+        'tpl' => $data_tpl
+    ));
+
+    #echo '<pre>'; var_dump($data_tpl); echo '</pre>'; #exit;
+    #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
+
+    //$output = $twig->render('tpl', array('data' => $json));
+
+    $version = 1;
+    if (!empty($_SERVER['JTV2'])) {
+        $version = 2;
+    }
+
+    try {
+        $output = $twig->render('tpl', array('data' => $json, 'version' => $version, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty));
+    } catch (Exception $e) {
+        echo 'Caught exception: ',  $e->getMessage(), "\n";
+    }
+
 }
 ?>
 <?php echo $output; ?>
