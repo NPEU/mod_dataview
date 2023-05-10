@@ -38,6 +38,7 @@ class ModDataviewHelper
 
         if ($params->get('highcharts', false)) {
             $doc->addScript('https://code.highcharts.com/highcharts.js');
+            $doc->addScript('https://code.highcharts.com/highcharts-more.js');
             $doc->addScript('https://code.highcharts.com/modules/exporting.js');
             $doc->addScript('https://code.highcharts.com/modules/export-data.js');
             $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
