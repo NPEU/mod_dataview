@@ -1,49 +1,69 @@
 <?php
-/**
- * @package     Joomla.Site
- * @subpackage  mod_dataview
- *
- * @copyright   Copyright (C) NPEU 2019.
- * @license     MIT License; see LICENSE.md
- */
 
-defined('_JEXEC') or die;
+namespace NPEU\Module\Dataview\Site\Helper;
 
-use Joomla\String\StringHelper;
+require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
-require_once __DIR__ . '/vendor/autoload.php';
+
+
+use Joomla\CMS\Application\SiteApplication;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseAwareInterface;
+use Joomla\Database\DatabaseAwareTrait;
+use Joomla\Registry\Registry;
+
 
 use \Michelf\Markdown;
 
+defined('_JEXEC') or die;
+
+
+
 /**
  * Helper for mod_dataview
+ *
+ * @since  1.5
  */
-class ModDataviewHelper
+class DataviewHelper implements DatabaseAwareInterface
 {
-    /**
+    use DatabaseAwareTrait;
+
+
+    /*public function getStuff(Registry $config, SiteApplication $app): array
+    {
+        if (!$app instanceof SiteApplication) {
+            return [];
+        }
+        $db = $this->getDatabase();
+
+        // Do some database stuff here.
+
+        return ["Hello, world."];
+    }*/
+
+
+        /**
      * Loads JS/CSS
      *
      * @param array $params
      * @return void
      * @access public
      */
-    public static function loadAssets($params)
+    public function loadAssets($params): void
     {
-        $doc = JFactory::getDocument();
+        $doc = Factory::getDocument();
         //$doc->addStyleSheet();
         //$doc->addScript();
-
-        $template_path = JURI::root() . '/templates/npeu6';
+        $template_path = Uri::getInstance()->root() . '/templates/npeu6';
 
 
         if ($params->get('highcharts', false)) {
             $doc->addScript('https://code.highcharts.com/highcharts.js');
-            $doc->addScript('https://code.highcharts.com/highcharts-more.js');
             $doc->addScript('https://code.highcharts.com/modules/exporting.js');
             $doc->addScript('https://code.highcharts.com/modules/export-data.js');
             $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
             $doc->addScript('https://code.highcharts.com/modules/annotations.js');
-            $doc->addScript('https://code.highcharts.com/modules/pattern-fill.js');
         }
 
         if ($params->get('filterability', false)) {
@@ -66,7 +86,7 @@ class ModDataviewHelper
      * @return string
      * @access public
      */
-    public static function htmlID($text)
+    public function htmlID($text): string
     {
         if (!is_string($text)) {
             trigger_error('Function \'html_id\' expects argument 1 to be an string', E_USER_ERROR);
@@ -84,7 +104,7 @@ class ModDataviewHelper
      * @return string
      * @access public
      */
-    public static function stripPunctuation($text)
+    public function stripPunctuation($text): string
     {
         if (!is_string($text)) {
             trigger_error('Function \'strip_punctuation\' expects argument 1 to be an string', E_USER_ERROR);
@@ -109,27 +129,30 @@ class ModDataviewHelper
         $prime = '\x{2032}\x{2033}\x{2034}\x{2057}';
         $nummodifiers = $numbersign . $percent . $prime;
         $return = preg_replace(
-        array(
-            // Remove separator, control, formatting, surrogate,
-            // open/close quotes.
-            '/[\p{Z}\p{Cc}\p{Cf}\p{Cs}\p{Pi}\p{Pf}]/u',
-            // Remove other punctuation except special cases
-            '/\p{Po}(?<![' . $specialquotes .
-            $numseparators . $urlall . $nummodifiers . '])/u',
-            // Remove non-URL open/close brackets, except URL brackets.
-            '/[\p{Ps}\p{Pe}](?<![' . $urlbrackets . '])/u',
-            // Remove special quotes, dashes, connectors, number
-            // separators, and URL characters followed by a space
-            '/[' . $specialquotes . $numseparators . $urlspaceafter .
-            '\p{Pd}\p{Pc}]+((?= )|$)/u',
-            // Remove special quotes, connectors, and URL characters
-            // preceded by a space
-            '/((?<= )|^)[' . $specialquotes . $urlspacebefore . '\p{Pc}]+/u',
-            // Remove dashes preceded by a space, but not followed by a number
-            '/((?<= )|^)\p{Pd}+(?![\p{N}\p{Sc}])/u',
-            // Remove consecutive spaces
-            '/ +/',
-            ), ' ', $text);
+            [
+                // Remove separator, control, formatting, surrogate,
+                // open/close quotes.
+                '/[\p{Z}\p{Cc}\p{Cf}\p{Cs}\p{Pi}\p{Pf}]/u',
+                // Remove other punctuation except special cases
+                '/\p{Po}(?<![' . $specialquotes .
+                $numseparators . $urlall . $nummodifiers . '])/u',
+                // Remove non-URL open/close brackets, except URL brackets.
+                '/[\p{Ps}\p{Pe}](?<![' . $urlbrackets . '])/u',
+                // Remove special quotes, dashes, connectors, number
+                // separators, and URL characters followed by a space
+                '/[' . $specialquotes . $numseparators . $urlspaceafter .
+                '\p{Pd}\p{Pc}]+((?= )|$)/u',
+                // Remove special quotes, connectors, and URL characters
+                // preceded by a space
+                '/((?<= )|^)[' . $specialquotes . $urlspacebefore . '\p{Pc}]+/u',
+                // Remove dashes preceded by a space, but not followed by a number
+                '/((?<= )|^)\p{Pd}+(?![\p{N}\p{Sc}])/u',
+                // Remove consecutive spaces
+                '/ +/',
+            ],
+            ' ',
+            $text
+        );
         $return = str_replace('/', '_', $return);
         return str_replace("'", '', $return);
     }
@@ -140,9 +163,10 @@ class ModDataviewHelper
      * @param  array    $tpls   Array of strings bound to template names
      * @return object
      */
-    public static function getTwig($tpls)
+    public function getTwig(Registry $config, SiteApplication $app): object
     {
-        $loader = new \Twig\Loader\ArrayLoader($tpls);
+        $tpl = $config->get('data_tpl');
+        $loader = new \Twig\Loader\ArrayLoader(['tpl' => $tpl]);
         $twig   = new \Twig\Environment($loader);
         //$twig = new Twig_Environment($loader, ['debug' => true]);
 
@@ -206,14 +230,14 @@ class ModDataviewHelper
         $twig->addFilter($sum_filter);
 
         // Add str_replace filter:
-		$str_replace = new \Twig\TwigFilter('str_replace', function ($string, $search = '', $replace = '') {
-    		$new_string = '';
+        $str_replace = new \Twig\TwigFilter('str_replace', function ($string, $search = '', $replace = '') {
+            $new_string = '';
 
-    		$new_string = str_replace( $search, $replace, $string);
+            $new_string = str_replace( $search, $replace, $string);
 
-    		return $new_string;
-		});
-		$twig->addFilter($str_replace);
+            return $new_string;
+        });
+        $twig->addFilter($str_replace);
 
 
        // Add filter for image fallback (image to use if preferred one doesn't exist):
@@ -230,8 +254,8 @@ class ModDataviewHelper
             }
 
             return '';
-		});
-		$twig->addFilter($img_fallback_filter);
+        });
+        $twig->addFilter($img_fallback_filter);
 
        // Add filter for image path (height from width):
        $img_height_filter = new \Twig\TwigFilter('height', function ($image_path, $width) {
@@ -253,9 +277,9 @@ class ModDataviewHelper
             }
             //$height = round($width * $image_ratio);
 
-    		return $height;
-		});
-		$twig->addFilter($img_height_filter);
+            return $height;
+        });
+        $twig->addFilter($img_height_filter);
 
        // Add filter for image path (width from height):
        $img_width_filter = new \Twig\TwigFilter('width', function ($image_path, $height) {
@@ -277,9 +301,9 @@ class ModDataviewHelper
             }
             //$width = round($height / $image_ratio);
 
-    		return $width;
-		});
-		$twig->addFilter($img_width_filter);
+            return $width;
+        });
+        $twig->addFilter($img_width_filter);
 
 
         return $twig;
