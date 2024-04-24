@@ -92,7 +92,7 @@ class DataviewHelper implements DatabaseAwareInterface
             trigger_error('Function \'html_id\' expects argument 1 to be an string', E_USER_ERROR);
             return false;
         }
-        $return = strtolower(trim(preg_replace('/\s+/', '-', self::stripPunctuation($text))));
+        $return = strtolower(trim(preg_replace('/\s+/', '-', $this->stripPunctuation($text))));
         return $return;
     }
 
@@ -217,7 +217,7 @@ class DataviewHelper implements DatabaseAwareInterface
         $html_id_filter = new \Twig\TwigFilter('html_id', function ($string) {
             $new_string = '';
 
-            $new_string = self::htmlID($string);
+            $new_string = $this->htmlID($string);
 
             return $new_string;
         });
