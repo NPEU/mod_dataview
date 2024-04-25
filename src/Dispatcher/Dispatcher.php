@@ -31,7 +31,7 @@ class Dispatcher extends AbstractModuleDispatcher implements HelperFactoryAwareI
 
         $data['twig'] = $this->getHelperFactory()
             ->getHelper('DataviewHelper')
-            ->getTwig($data['params'], $this->getApplication());
+            ->getTwig($params, $this->getApplication());
 
         $this->getHelperFactory()->getHelper('DataviewHelper')->loadAssets($params);
 
