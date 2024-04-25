@@ -5,7 +5,6 @@ namespace NPEU\Module\Dataview\Site\Helper;
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
 
-
 use Joomla\CMS\Application\SiteApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
@@ -17,8 +16,6 @@ use Joomla\Registry\Registry;
 use \Michelf\Markdown;
 
 defined('_JEXEC') or die;
-
-
 
 /**
  * Helper for mod_dataview
@@ -43,7 +40,7 @@ class DataviewHelper implements DatabaseAwareInterface
     }*/
 
 
-        /**
+    /**
      * Loads JS/CSS
      *
      * @param array $params
