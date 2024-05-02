@@ -16,7 +16,7 @@
 
     <updateservers>
         <!-- Note: No spaces or linebreaks allowed between the server tags -->
-        <server type="extension" name="NPEU: mod_dataview Update Site">https://raw.githubusercontent.com/NPEU/mod_dataview/master/update-manifest.xml</server>
+        <server type="extension" name="NPEU: mod_dataview Update Site">https://raw.githubusercontent.com/NPEU/mod_dataview/main/update-manifest.xml</server>
     </updateservers>
 
     <files>
