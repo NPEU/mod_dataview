@@ -22,7 +22,7 @@
     <namespace path="src">NPEU\Module\Dataview</namespace>
 
     <files>
-        <filename module="mod_dataview">services</filename>
+        <folder module="mod_dataview">services</folder>
         <folder>language</folder>
         <folder>tmpl</folder>
         <folder>vendor</folder>
