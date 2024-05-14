@@ -11,10 +11,12 @@ defined('_JEXEC') or die;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+use Joomla\CMS\Factory;
+
 use \Michelf\Markdown;
 
 
-$doc = JFactory::getDocument();
+$doc = Factory::getDocument();
 
 $output          = false;
 $data            = false;
@@ -124,7 +126,7 @@ if ($data_src) {
 
     // Check for proxy: (note we DON'T want to use this if it's an internal URL)
     $proxy     = NULL;
-    $config    = JFactory::getConfig();
+    $config    = Factory::getConfig();
     $has_proxy = $config->get('proxy_enable');
 
     if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
@@ -133,12 +135,12 @@ if ($data_src) {
         $proxy_user = $config->get('proxy_user');
         $proxy_pass = $config->get('proxy_pass');
 
-        $context = array(
-            'http' => array(
+        $context = [
+            'http' => [
                 'proxy'           => $proxy_host . ':' . $proxy_port,
                 'request_fulluri' => true
-            )
-        );
+            ]
+        ];
         $proxy = stream_context_create($context);
     }
 
@@ -160,22 +162,20 @@ if ($data_src) {
 }
 
 if ($output === false) {
-    $twig = ModDataviewHelper::getTwig(array(
+    /*
+    $twig should already have been pushed here from the helper.
+    */
+    /*$twig = ModDataviewHelper::getTwig(array(
         'tpl' => $data_tpl
-    ));
+    ));*/
 
     #echo '<pre>'; var_dump($data_tpl); echo '</pre>'; #exit;
     #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
 
     //$output = $twig->render('tpl', array('data' => $json));
 
-    $version = 1;
-    if (!empty($_SERVER['JTV2'])) {
-        $version = 2;
-    }
-
     try {
-        $output = $twig->render('tpl', array('data' => $json, 'version' => $version, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty));
+        $output = $twig->render('tpl', ['data' => $json, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty]);
     } catch (Exception $e) {
         echo 'Caught exception: ',  $e->getMessage(), "\n";
     }
