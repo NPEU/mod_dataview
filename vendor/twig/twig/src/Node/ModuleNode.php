@@ -28,7 +28,7 @@ use Twig\Source;
  */
 final class ModuleNode extends Node
 {
-    public function __construct(Node $body, AbstractExpression $parent = null, Node $blocks, Node $macros, Node $traits, $embeddedTemplates, Source $source)
+    public function __construct(Node $body, ?AbstractExpression $parent, Node $blocks, Node $macros, Node $traits, $embeddedTemplates, Source $source)
     {
         $nodes = [
             'body' => $body,
@@ -355,6 +355,9 @@ final class ModuleNode extends Node
     protected function compileGetTemplateName(Compiler $compiler)
     {
         $compiler
+            ->write("/**\n")
+            ->write(" * @codeCoverageIgnore\n")
+            ->write(" */\n")
             ->write("public function getTemplateName()\n", "{\n")
             ->indent()
             ->write('return ')
@@ -409,6 +412,9 @@ final class ModuleNode extends Node
         }
 
         $compiler
+            ->write("/**\n")
+            ->write(" * @codeCoverageIgnore\n")
+            ->write(" */\n")
             ->write("public function isTraitable()\n", "{\n")
             ->indent()
             ->write(sprintf("return %s;\n", $traitable ? 'true' : 'false'))
@@ -420,6 +426,9 @@ final class ModuleNode extends Node
     protected function compileDebugInfo(Compiler $compiler)
     {
         $compiler
+            ->write("/**\n")
+            ->write(" * @codeCoverageIgnore\n")
+            ->write(" */\n")
             ->write("public function getDebugInfo()\n", "{\n")
             ->indent()
             ->write(sprintf("return %s;\n", str_replace("\n", '', var_export(array_reverse($compiler->getDebugInfo(), true), true))))
