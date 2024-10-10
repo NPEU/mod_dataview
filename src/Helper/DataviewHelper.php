@@ -62,6 +62,7 @@ class DataviewHelper implements DatabaseAwareInterface
             $doc->addScript('https://code.highcharts.com/modules/export-data.js');
             $doc->addScript('https://code.highcharts.com/modules/accessibility.js');
             $doc->addScript('https://code.highcharts.com/modules/annotations.js');
+            $doc->addScript('https://code.highcharts.com/modules/pattern-fill.js');
         }
 
         if ($params->get('filterability', false)) {
