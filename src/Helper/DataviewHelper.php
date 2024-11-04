@@ -167,7 +167,21 @@ class DataviewHelper implements DatabaseAwareInterface
         $tpl = $config->get('data_tpl');
         $loader = new \Twig\Loader\ArrayLoader(['tpl' => $tpl]);
         $twig   = new \Twig\Environment($loader);
-        //$twig = new Twig_Environment($loader, ['debug' => true]);
+
+        #$twig   = new \Twig\Environment($loader, ['debug' => true]);
+        #$twig->addExtension(new \Twig\Extension\DebugExtension());
+
+        // Add is_array test:
+        $is_array = new \Twig\TwigTest('array', function ($value) {
+            return (bool) is_array($value);
+        });
+        $twig->addTest($is_array);
+
+        // Add object test:
+        $is_object = new \Twig\TwigTest('object', function ($value) {
+            return (bool) is_object($value);
+        });
+        $twig->addTest($is_object);
 
         // Add markdown filter:
         $md_filter = new \Twig\TwigFilter('md', function ($string) {

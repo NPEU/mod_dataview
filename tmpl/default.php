@@ -145,6 +145,7 @@ if ($data_src) {
     }
 
     $data = file_get_contents($data_src, false, $proxy);
+    #echo '<pre>'; var_dump($data); echo '</pre>'; exit;
 
     if ($data === false) {
         $output = Markdown::defaultTransform($data_src_err);
