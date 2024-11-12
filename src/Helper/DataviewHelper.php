@@ -168,8 +168,12 @@ class DataviewHelper implements DatabaseAwareInterface
         $loader = new \Twig\Loader\ArrayLoader(['tpl' => $tpl]);
         $twig   = new \Twig\Environment($loader);
 
-        $twig   = new \Twig\Environment($loader, ['debug' => true]);
-        $twig->addExtension(new \Twig\Extension\DebugExtension());
+        // Option to add debugging. Use like:
+        // <pre>
+        //   {{ dump(user) }}
+        // </pre>
+        #$twig   = new \Twig\Environment($loader, ['debug' => true]);
+        #$twig->addExtension(new \Twig\Extension\DebugExtension());
 
         // Add markdown filter:
         $md_filter = new \Twig\TwigFilter('md', function ($string) {
