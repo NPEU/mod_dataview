@@ -121,15 +121,28 @@ if ($data_src) {
         $data_src = $domain . '/' . trim($data_src, '/');
     }
 
+    // If the data src is meant to be to the same server, but the value stored in the datanase
+    // has come from the live server, it won't match and the data won't fetch, so check for and fix
+    // that:
+
+    $src_url_parts = parse_url($data_src);
+    $src_parent_domain = preg_replace('/^([a-z]+\.)/', '', $src_url_parts['host']);
+
+    $server_parent_domain = preg_replace('/^([a-z]+\.)/', '', $_SERVER['SERVER_NAME']);
+
+    if ($src_parent_domain == $server_parent_domain) {
+        $data_src = str_replace($src_url_parts['host'], $_SERVER['SERVER_NAME'], $data_src);
+        $src_url_parts = parse_url($data_src);
+    }
+
     // Inspect the final URL to determine if it's an internal or external address:
-    $url_parts = parse_url($data_src);
 
     // Check for proxy: (note we DON'T want to use this if it's an internal URL)
     $proxy     = NULL;
     $config    = Factory::getConfig();
     $has_proxy = $config->get('proxy_enable');
 
-    if ($has_proxy && $_SERVER['SERVER_NAME'] != $url_parts['host']) {
+    if ($has_proxy && $_SERVER['SERVER_NAME'] != $src_url_parts['host']) {
         $proxy_host = $config->get('proxy_host');
         $proxy_port = $config->get('proxy_port');
         $proxy_user = $config->get('proxy_user');
