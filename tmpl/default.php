@@ -105,10 +105,12 @@ if ($data_src && (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs))) {
         // break anything.
         #$data_src = preg_replace('/\?.*$/', '', $data_src);
         $delim = (strpos($data_src, '?')) == true ? '&' : '?';
-        $data_src .= $delim . urldecode(http_build_query($new_qs));
+        #$data_src .= $delim . urldecode(http_build_query($new_qs));
+        $data_src .= $delim . http_build_query($new_qs);
     }
 
     #echo '<pre>'; var_dump($data_src); echo '</pre>'; exit;
+    #echo '<pre>'; var_dump($new_qs); echo '</pre>'; exit;
 
     if (!empty($new_qs)) {
         foreach ($new_qs as $name => $vals) {
@@ -197,7 +199,7 @@ if ($output === false) {
     #echo '<pre>'; var_dump($json); echo '</pre>'; exit;
 
     //$output = $twig->render('tpl', array('data' => $json));
-
+    #echo '<pre>'; var_dump($form_vals); echo '</pre>'; exit;
     try {
         $output = $twig->render('tpl', ['data' => $json, 'form_vals' => $form_vals, 'qs_empty' => $qs_empty]);
     } catch (Exception $e) {
