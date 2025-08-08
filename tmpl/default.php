@@ -65,6 +65,10 @@ if ($data_src && (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs))) {
 #echo 'param_name<pre>'; var_dump($param_name); echo '</pre>'; #exit;
         if (preg_match('#/.+/#', $param_values)) {
             // Test the pattern against the qs value:
+            if (preg_match($param_values, $url_qs_array[$param_name], $matches)) {
+                #echo 'matches<pre>'; var_dump($matches); echo '</pre>'; #exit;
+                $new_qs[$param_name] = $matches[0];
+            }
         } else {
             if (strpos($param_values, '|') !== false) {
                 $vals = explode('|', trim($param_values));
@@ -96,8 +100,12 @@ if ($data_src && (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs))) {
     }
 
     if (!empty($new_qs)) {
-        $data_src = preg_replace('/\?.*$/', '', $data_src);
-        $data_src .= '?' . urldecode(http_build_query($new_qs));
+        // I can't remember why I decided to replacce the QS instead of appending. Applending is
+        // is what I need to make a pubs search thing working so changing it now, hoping it won't
+        // break anything.
+        #$data_src = preg_replace('/\?.*$/', '', $data_src);
+        $delim = (strpos($data_src, '?')) == true ? '&' : '?';
+        $data_src .= $delim . urldecode(http_build_query($new_qs));
     }
 
     #echo '<pre>'; var_dump($data_src); echo '</pre>'; exit;
@@ -111,6 +119,7 @@ if ($data_src && (!empty($url_qs) && $data_aqs_tog && !empty($data_aqs))) {
 
 
 #echo '<pre>'; var_dump($form_vals); echo '</pre>'; exit;
+#echo '<pre>'; var_dump($data_src); echo '</pre>'; exit;
 
 if ($data_src) {
     // Allow for relative data src URLs:
@@ -157,6 +166,7 @@ if ($data_src) {
         $proxy = stream_context_create($context);
     }
 
+    #echo 'data_src<pre>'; var_dump($data_src); echo '</pre>'; exit;
     $data = file_get_contents($data_src, false, $proxy);
     #echo '<pre>'; var_dump($data); echo '</pre>'; exit;
 
